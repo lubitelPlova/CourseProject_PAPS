@@ -1,19 +1,16 @@
 import sys  # sys нужен для передачи argv в QApplication
 from PyQt5 import QtWidgets
-import auth  # Это наш конвертированный файл дизайна
-
-class ExampleApp(QtWidgets.QMainWindow, auth.Ui_MainWindow):
-    def __init__(self):
-        # Это здесь нужно для доступа к переменным, методам
-        # и т.д. в файле auth.py
-        super().__init__()
-        self.setupUi(self)  # Это нужно для инициализации нашего дизайна
+ # Это наш конвертированный файл дизайна
+from WindowFactory import AuthWindowFactory, AdminWindowFactory, MainWindowFactory
 
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication
-    window = ExampleApp()  # Создаём объект класса ExampleApp
+    window = AuthWindowFactory.create_window()
+    adminWindow = AdminWindowFactory.create_window()
+    mainWindow = MainWindowFactory.create_window()
+    AuthWindowFactory.setMainAdmin(window, mainWindow, adminWindow)
     window.show()  # Показываем окно
     app.exec_()  # и запускаем приложение
 

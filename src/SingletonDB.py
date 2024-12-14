@@ -1,18 +1,24 @@
 import sqlite3
+import threading
+import logging
 
 class SingletonDB:
-    _instance = None
+    _local = threading.local()
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(SingletonDB, cls).__new__(cls)
-            cls._instance.conn = sqlite3.connect('users.db')
-            cls._instance.cursor = cls._instance.conn.cursor()
-        return cls._instance
-    
+    def __init__(self):
+        if not hasattr(self._local, 'conn'):
+            self._local.conn = sqlite3.connect('users.db')
+            self._local.cursor = self._local.conn.cursor()
+
     def execute(self, query, params=()):
-        self.cursor.execute(query, params)
-        return self.cursor.fetchone()
+        try:
+            self._local.cursor.execute(query, params)
+        except sqlite3.Error as e:
+            print(f"Ошибка {e}")
+        return self._local.cursor.fetchall()
+    
+    def commit(self):
+        self._local.conn.commit()
 
     def close(self):
-        self.conn.close()
+        self._local.conn.close()

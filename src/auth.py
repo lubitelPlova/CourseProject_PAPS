@@ -10,8 +10,6 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from login_view_model import LoginViewModel
-from workspace_window import WorkspaceWindow
-import requests
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -65,32 +63,13 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.viewModel = LoginViewModel()
-        self.workspaceWindow = WorkspaceWindow()
+    
+        
         self.LoginLine.textChanged.connect(self.viewModel.set_password)
         self.PasswordLine.textChanged.connect(self.viewModel.set_login)
-        self.enterButton.clicked.connect(self.check_credentials)
 
 
-
-    def check_credentials(self):
-        login = self.viewModel.get_login()
-        password = self.viewModel.get_password()
-        # print(type(login))
-        response = requests.post("http://localhost:5000/login", json={"login": login, "password": password})
-        if response.status_code == 200:  # проверяем, что запрос был успешным
-            try:
-                data = response.json()
-                if "success" in data and data["success"]:
-                    print("Правильный логин или пароль!")
-                    self.workspaceWindow.show()
-                    self.close()
-                else:
-                    print("Неправильный логин или пароль!")
-            except ValueError:  # если ответ не в формате JSON
-                print("Ошибка формата ответа")
-        else:
-            print("Ошибка сервера")
-
+    
             # Мне кажется, эти файлы менять ваще нежелательно, лучше стоит добавлять функционал к классам окна, а это оставить как UI.
 
     def retranslateUi(self, MainWindow):
